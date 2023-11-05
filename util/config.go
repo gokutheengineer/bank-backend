@@ -5,7 +5,9 @@ import (
 )
 
 type Config struct {
-	Environment string `mapstructure:"ENVIRONMENT"`
+	Environment   string `mapstructure:"ENVIRONMENT"`
+	DB_Source     string `mapstructure:"DB_SOURCE"`
+	Migration_Url string `mapstructure:"MIGRATION_URL"`
 }
 
 // TODO check env to differantiate between env to apply different configs for dev, test, prod
