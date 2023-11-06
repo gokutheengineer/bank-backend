@@ -13,7 +13,6 @@ import (
 var testStore Store
 
 func TestMain(m *testing.M) {
-
 	config, err := util.LoadConfig("../../configs")
 	if err != nil {
 		log.Fatal("can't load config file: ", err)
@@ -27,5 +26,4 @@ func TestMain(m *testing.M) {
 
 	testStore = NewStore(pgxPool)
 	os.Exit(m.Run())
-
 }

@@ -2,36 +2,47 @@ package db
 
 import (
 	"context"
-	"fmt"
 	"testing"
 
+	"github.com/gokutheengineer/bank-backend/util"
 	"github.com/stretchr/testify/require"
 )
 
-func TestCreateAccount(t *testing.T) {
+func createTestAccount(t *testing.T) (account Account) {
 	createAccountParams := &CreateAccountParams{
-		Owner:    "Gokhan",
-		Balance:  100,
-		Currency: "TRY",
+		Owner:    util.RandomOwner(),
+		Balance:  util.RandomMoneyAmount(),
+		Currency: util.RandomCurrency(),
 	}
 
 	account, err := testStore.CreateAccount(context.Background(), *createAccountParams)
 	require.NoError(t, err)
+	require.NoError(t, err)
 	require.NotEmpty(t, account)
+	require.Equal(t, createAccountParams.Owner, account.Owner)
+	require.Equal(t, createAccountParams.Balance, account.Balance)
+	require.Equal(t, createAccountParams.Currency, account.Currency)
 
-	fmt.Println("created at: ", account.CreatedAt)
-	fmt.Println("currency: ", account.Currency)
-	fmt.Println("ID : ", account.ID)
+	require.NotZero(t, account.ID)
+	require.NotZero(t, account.CreatedAt)
+
+	return
+}
+
+func TestCreateAccount(t *testing.T) {
+	createTestAccount(t)
 }
 
 func TestGetAccount(t *testing.T) {
-	account_id := 3
+	account_created := createTestAccount(t)
 
-	account, err := testStore.GetAccount(context.Background(), int64(account_id))
+	account_retrieved, err := testStore.GetAccount(context.Background(), account_created.ID)
 	require.NoError(t, err)
-	require.NotEmpty(t, account)
+	require.NotEmpty(t, account_retrieved)
 
-	fmt.Println("created at: ", account.CreatedAt)
-	fmt.Println("ID : ", account.Owner)
-
+	require.Equal(t, account_created.ID, account_retrieved.ID)
+	require.Equal(t, account_created.Balance, account_retrieved.Balance)
+	require.Equal(t, account_created.Currency, account_retrieved.Currency)
+	require.Equal(t, account_created.Owner, account_retrieved.Owner)
+	require.WithinDuration(t, account_created.CreatedAt, account_retrieved.CreatedAt, 0)
 }
