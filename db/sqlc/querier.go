@@ -11,13 +11,20 @@ import (
 type Querier interface {
 	AddAccountBalance(ctx context.Context, arg AddAccountBalanceParams) (Account, error)
 	CreateAccount(ctx context.Context, arg CreateAccountParams) (Account, error)
+	CreateEntry(ctx context.Context, arg CreateEntryParams) (Entry, error)
+	CreateTransfer(ctx context.Context, arg CreateTransferParams) (Transfer, error)
 	DeleteAccount(ctx context.Context, id int64) error
 	GetAccount(ctx context.Context, id int64) (Account, error)
 	GetAccountByOwner(ctx context.Context, owner string) (Account, error)
 	GetAccountForUpdate(ctx context.Context, id int64) (Account, error)
+	GetEntry(ctx context.Context, id int64) (Entry, error)
 	GetMaxBalanceForCurrency(ctx context.Context, currency string) (interface{}, error)
 	GetMinBalanceForCurrency(ctx context.Context, currency string) (interface{}, error)
+	GetTransfer(ctx context.Context, id int64) (Transfer, error)
 	ListAccounts(ctx context.Context, arg ListAccountsParams) ([]Account, error)
+	ListEntries(ctx context.Context, arg ListEntriesParams) ([]Entry, error)
+	ListTransfersAmong(ctx context.Context, arg ListTransfersAmongParams) ([]Transfer, error)
+	ListTransfersOf(ctx context.Context, arg ListTransfersOfParams) ([]Transfer, error)
 	UpdateAccount(ctx context.Context, arg UpdateAccountParams) (Account, error)
 }
 
