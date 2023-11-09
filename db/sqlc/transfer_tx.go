@@ -49,9 +49,18 @@ func (store *QueryStore) TransferTx(ctx context.Context, inputParams TransferTxI
 			return err
 		}
 
-		result.FromAccount, result.ToAccount, err = addMoney(ctx, queries, inputParams.FromAccountID, result.Transfer.ToAccountID, inputParams.Amount)
-		if err != nil {
-			return fmt.Errorf("addMoney is failed: %v", err)
+		// To avoid deadlock, we make sure two concourrent transactions always lock the accounts in the same order
+		// This can be done by sorting the account IDs and lock them in order, always lock smaller ID first
+		if inputParams.FromAccountID < inputParams.ToAccountID {
+			result.FromAccount, result.ToAccount, err = addMoney(ctx, queries, inputParams.FromAccountID, -inputParams.Amount, result.Transfer.ToAccountID, inputParams.Amount)
+			if err != nil {
+				return fmt.Errorf("addMoney is failed: %v", err)
+			}
+		} else {
+			result.FromAccount, result.ToAccount, err = addMoney(ctx, queries, inputParams.ToAccountID, inputParams.Amount, result.Transfer.FromAccountID, -inputParams.Amount)
+			if err != nil {
+				return fmt.Errorf("addMoney is failed: %v", err)
+			}
 		}
 
 		return err
@@ -60,9 +69,9 @@ func (store *QueryStore) TransferTx(ctx context.Context, inputParams TransferTxI
 	return result, err
 }
 
-func addMoney(ctx context.Context, queries *Queries, fromAccountID, toAccountID, amount int64) (fromAccount, toAccount Account, err error) {
+func addMoney(ctx context.Context, queries *Queries, fromAccountID, amount1, toAccountID, amount2 int64) (fromAccount, toAccount Account, err error) {
 	fromAccount, err = queries.AddAccountBalance(ctx, AddAccountBalanceParams{
-		Amount: -amount,
+		Amount: amount1,
 		ID:     fromAccountID,
 	})
 	if err != nil {
@@ -70,7 +79,7 @@ func addMoney(ctx context.Context, queries *Queries, fromAccountID, toAccountID,
 	}
 
 	toAccount, err = queries.AddAccountBalance(ctx, AddAccountBalanceParams{
-		Amount: amount,
+		Amount: amount2,
 		ID:     toAccountID,
 	})
 
