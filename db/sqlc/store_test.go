@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	"github.com/gokutheengineer/bank-backend/util"
@@ -11,6 +12,8 @@ import (
 func TestTransferTx(t *testing.T) {
 	fromAccount := createTestAccount(t)
 	toAccount := createTestAccount(t)
+
+	fmt.Println("\n Before fromAccount balance: ", fromAccount.Balance, ", toAccount balance: ", toAccount.Balance)
 
 	noOfConcurrentTransferTXs := 10
 	errors := make(chan error)
@@ -77,4 +80,61 @@ func TestTransferTx(t *testing.T) {
 		_, err = testStore.GetEntry(context.Background(), result.ToEntry.ID)
 		require.NoError(t, err)
 	}
+
+	acc1, err := testStore.GetAccount(context.Background(), fromAccount.ID)
+	require.NoError(t, err)
+	acc2, err := testStore.GetAccount(context.Background(), toAccount.ID)
+	require.NoError(t, err)
+
+	fmt.Println("\n After fromAccount balance: ", acc1.Balance, ", toAccount balance: ", acc2.Balance)
+
+}
+
+func TestTransferTxDeadlock(t *testing.T) {
+	account1 := createTestAccount(t)
+	account2 := createTestAccount(t)
+
+	fmt.Println("\n Before fromAccount balance: ", account1.Balance, ", toAccount balance: ", account2.Balance)
+
+	noOfConcurrentTransferTXs := 10
+	errors := make(chan error)
+	// transferResults := make(chan TransferTxResult)
+	transferAmount := util.RandomInt(0, account1.Balance/int64(noOfConcurrentTransferTXs))
+
+	for i := 0; i < noOfConcurrentTransferTXs; i++ {
+		fromAccountID := account1.ID
+		toAccountID := account2.ID
+
+		if i%2 == 1 {
+			fromAccountID = account2.ID
+			toAccountID = account1.ID
+		}
+		go func() {
+			inputParams := TransferTxInputParams{
+				FromAccountID: fromAccountID,
+				ToAccountID:   toAccountID,
+				Amount:        transferAmount,
+			}
+			_, err := testStore.TransferTx(context.Background(), inputParams)
+			errors <- err
+		}()
+	}
+
+	// check transaction results
+	for i := 0; i < noOfConcurrentTransferTXs; i++ {
+		err := <-errors
+		require.NoError(t, err)
+	}
+
+	// we expect in the end both accounts' balances to be the same
+	acc1, err := testStore.GetAccount(context.Background(), account1.ID)
+	require.NoError(t, err)
+	acc2, err := testStore.GetAccount(context.Background(), account2.ID)
+	require.NoError(t, err)
+
+	require.Equal(t, acc1.Balance, account1.Balance)
+	require.Equal(t, acc2.Balance, account2.Balance)
+
+	fmt.Println("\n After fromAccount balance: ", account1.Balance, ", toAccount balance: ", account2.Balance)
+
 }
