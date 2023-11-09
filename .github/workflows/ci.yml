@@ -1,4 +1,4 @@
-name: ci-test
+name: Run tests
 
 on:
   push:
@@ -11,8 +11,26 @@ jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:14-alpine
+        env:
+          POSTGRES_USER: root
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: bank
+        # Set health checks to wait until postgres has started
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5    
+
     steps:
-    - uses: actions/checkout@v3
+    - name: Check out code to Go module dir
+      uses: actions/checkout@v3
 
     - name: Set up Go 2
       uses: actions/setup-go@v4
