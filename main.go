@@ -25,7 +25,7 @@ func main() {
 	store := db.NewStore(pgxPool)
 
 	server := api.NewServer(store)
-	err = server.Start("0.0.0.0:8080")
+	err = server.Start(config.ServerAddress)
 	if err != nil {
 		log.Fatal("can't start the server")
 	}
