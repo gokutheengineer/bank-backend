@@ -33,4 +33,7 @@ test:
 server:
 	go run main.go
 
-.PHONY: postgres createdb dropd new_migration migrateup migratedown migrateupby1 migratedownby1 sqlc test server
+mock: 
+	mockgen -destination db/mock/store.go github.com/gokutheengineer/bank-backend/db/sqlc Store
+
+.PHONY: postgres createdb dropd new_migration migrateup migratedown migrateupby1 migratedownby1 sqlc test server mock

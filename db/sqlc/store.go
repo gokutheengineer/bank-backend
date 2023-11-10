@@ -12,7 +12,7 @@ type Store interface {
 	Querier
 }
 
-// Embed Queries struct functionality into QueryStore struct
+// Embed Queries struct functionality into QueryStore struct. It is the implementation of the Store interface
 type QueryStore struct {
 	*Queries
 	connPool *pgxpool.Pool
