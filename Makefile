@@ -39,4 +39,10 @@ server:
 mock: 
 	mockgen -destination db/mock/store.go github.com/gokutheengineer/bank-backend/db/sqlc Store
 
-.PHONY: network postgres createdb dropd new_migration migrateup migratedown migrateupby1 migratedownby1 sqlc test server mock
+proto: 
+	rm -f pb/*.go
+	protoc --proto_path=proto --go_out=pb --go_opt=paths=source_relative \
+	--go-grpc_out=pb --go-grpc_opt=paths=source_relative \
+	proto/*.proto
+
+.PHONY: network postgres createdb dropd new_migration migrateup migratedown migrateupby1 migratedownby1 sqlc test server mock proto
