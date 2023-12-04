@@ -6,6 +6,15 @@ CREATE TABLE "accounts" (
   "created_at" timestamptz NOT NULL DEFAULT 'now()'
 );
 
+CREATE TABLE "users" (
+  "username" varchar PRIMARY KEY,
+  "fullname" varchar NOT NULL,
+  "email" varchar UNIQUE NOT NULL,
+  "password_hashed" varchar NOT NULL,
+  "created_at" timestamptz NOT NULL DEFAULT 'now()',
+  "password_updated_at" timestamptz NOT NULL DEFAULT 'now()'
+);
+
 CREATE TABLE "entries" (
   "id" bigserial PRIMARY KEY,
   "account_id" bigint NOT NULL,
@@ -23,6 +32,10 @@ CREATE TABLE "transfers" (
 
 CREATE INDEX ON "accounts" ("owner");
 
+CREATE UNIQUE INDEX ON "accounts" ("owner", "currency");
+
+CREATE INDEX ON "users" ("username");
+
 CREATE INDEX ON "entries" ("account_id");
 
 CREATE INDEX ON "transfers" ("from_account_id");
@@ -34,6 +47,10 @@ CREATE INDEX ON "transfers" ("from_account_id", "to_account_id");
 COMMENT ON COLUMN "entries"."amount" IS 'can be positive or negative';
 
 COMMENT ON COLUMN "transfers"."amount" IS 'positive';
+
+ALTER TABLE "accounts" ADD UNIQUE ("owner", "currency");
+
+ALTER TABLE "accounts" ADD FOREIGN KEY ("owner") REFERENCES "users" ("username");
 
 ALTER TABLE "entries" ADD FOREIGN KEY ("account_id") REFERENCES "accounts" ("id");
 

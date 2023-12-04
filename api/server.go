@@ -23,6 +23,9 @@ func NewServer(store db.Store) *Server {
 		v.RegisterValidation("currency", validCurrency)
 	}
 
+	router.POST("/users", server.handleCeateUser)
+	router.POST("/users/login", server.handleLoginUser)
+
 	router.POST("/accounts", server.handleCeateAccount)
 	router.GET("/accounts/:id", server.handleGetAccount)
 	router.GET("/accounts", server.handleListAccounts)
