@@ -5,10 +5,11 @@ import (
 )
 
 type Config struct {
-	Environment   string `mapstructure:"ENVIRONMENT"`
-	DB_Source     string `mapstructure:"DB_SOURCE"`
-	Migration_Url string `mapstructure:"MIGRATION_URL"`
-	ServerAddress string `mapstructure:"SERVER_ADDRESS"`
+	Environment       string `mapstructure:"ENVIRONMENT"`
+	DB_Source         string `mapstructure:"DB_SOURCE"`
+	Migration_Url     string `mapstructure:"MIGRATION_URL"`
+	HttpServerAddress string `mapstructure:"HTTP_SERVER_ADDRESS"`
+	GrpcServerAddress string `mapstructure:"GRPC_SERVER_ADDRESS"`
 }
 
 // TODO check env to differantiate between env to apply different configs for dev, test, prod

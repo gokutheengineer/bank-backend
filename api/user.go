@@ -9,9 +9,9 @@ import (
 )
 
 type createUserRequest struct {
-	Username string `json:"Username" binding:"required,alphanum"`
-	Fullname string `json:"Fullname" binding:"required,alphanum"`
-	Email    string `json:"Email" binding:"required,email"`
+	Username string `json:"username" binding:"required,alphanum"`
+	Fullname string `json:"fullname" binding:"required"`
+	Email    string `json:"email" binding:"required,email"`
 	Password string `json:"password" binding:"required"`
 }
 
@@ -23,7 +23,7 @@ type userResponse struct {
 	PasswordChangedAt time.Time `json:"password_changed_at"`
 }
 
-func (server *Server) handleCeateUser(ctx *gin.Context) {
+func (server *Server) handleCreateUser(ctx *gin.Context) {
 	var req createUserRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
