@@ -48,3 +48,7 @@ func RandomEmail() string {
 func RandomFullname() string {
 	return RandomString(5) + " " + RandomString(5)
 }
+
+func RandomPassword() string {
+	return HashPassword(RandomString(5))
+}

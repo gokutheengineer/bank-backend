@@ -29,7 +29,8 @@ func main() {
 	}
 
 	store := db.NewStore(pgxPool)
-	runGrpcServer(store, config)
+	//runGrpcServer(store, config)
+	runGinServer(store, config)
 }
 
 func runGrpcServer(store db.Store, config util.Config) {

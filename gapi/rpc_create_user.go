@@ -17,7 +17,6 @@ func (server *Server) CreateUser(ctx context.Context, req *pb.CreateUserRequest)
 	createUserArgs := db.CreateUserParams{
 		Username:       req.GetUsername(),
 		Fullname:       req.GetFullname(),
-		Email:          req.GetEmail(),
 		PasswordHashed: hashedPassword,
 	}
 
@@ -36,7 +35,6 @@ func (server *Server) CreateUser(ctx context.Context, req *pb.CreateUserRequest)
 		User: &pb.User{
 			Username:          user.Username,
 			Fullname:          user.Fullname,
-			Email:             user.Email,
 			PasswordChangedAt: timestamppb.New(user.PasswordUpdatedAt),
 			CreatedAt:         timestamppb.New(user.CreatedAt),
 		},

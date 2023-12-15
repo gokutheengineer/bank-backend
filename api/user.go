@@ -11,13 +11,11 @@ import (
 type createUserRequest struct {
 	Username string `json:"username" binding:"required,alphanum"`
 	Fullname string `json:"fullname" binding:"required"`
-	Email    string `json:"email" binding:"required,email"`
 	Password string `json:"password" binding:"required"`
 }
 
 type userResponse struct {
 	Username          string    `json:"Username" binding:"required,alphanum"`
-	Email             string    `json:"Email" binding:"required,email"`
 	Password          string    `json:"password" binding:"required"`
 	CreatedAt         time.Time `json:"created_at"`
 	PasswordChangedAt time.Time `json:"password_changed_at"`
@@ -33,7 +31,6 @@ func (server *Server) handleCreateUser(ctx *gin.Context) {
 	createUserArgs := db.CreateUserParams{
 		Username:       req.Username,
 		Fullname:       req.Fullname,
-		Email:          req.Email,
 		PasswordHashed: req.Password,
 	}
 
