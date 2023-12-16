@@ -3,15 +3,25 @@ package api
 import (
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	db "github.com/gokutheengineer/bank-backend/db/sqlc"
+	"github.com/gokutheengineer/bank-backend/util"
+	"github.com/lib/pq"
 )
 
 type createUserRequest struct {
-	Username string `json:"username" binding:"required,alphanum"`
+	Username string `json:"username" binding:"required,alphanum,min=6,max=16"`
 	Fullname string `json:"fullname" binding:"required"`
-	Password string `json:"password" binding:"required"`
+	Password string `json:"password" binding:"required,min=6"`
+}
+
+type CreateUserResponse struct {
+	Username          string    `json:"username"`
+	Fullname          string    `json:"fullname"`
+	CreatedAt         time.Time `json:"created_at"`
+	PasswordUpdatedAt time.Time `json:"password_updated_at"`
 }
 
 func (server *Server) handleCreateUser(ctx *gin.Context) {
@@ -21,18 +31,42 @@ func (server *Server) handleCreateUser(ctx *gin.Context) {
 		return
 	}
 
+	// hash password and store
+	hashedPassword, err := util.HashPasswordBcrypt(req.Password)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
 	createUserArgs := db.CreateUserParams{
 		Username:       req.Username,
 		Fullname:       req.Fullname,
-		PasswordHashed: req.Password,
+		PasswordHashed: hashedPassword,
 	}
 
 	user, err := server.store.CreateUser(ctx, createUserArgs)
 	if err != nil {
+		if pqErr, ok := err.(*pq.Error); ok {
+			switch pqErr.Code {
+			case "unique_violation":
+				{
+					ctx.JSON(http.StatusForbidden, errorResponse(err))
+					return
+				}
+			}
+		}
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
 	}
 
-	ctx.JSON(http.StatusOK, user)
+	rsp := &CreateUserResponse{
+		Username:          user.Username,
+		Fullname:          user.Fullname,
+		CreatedAt:         user.CreatedAt,
+		PasswordUpdatedAt: user.PasswordUpdatedAt,
+	}
+
+	ctx.JSON(http.StatusOK, rsp)
 }
 
 func (server *Server) handleLoginUser(ctx *gin.Context) {

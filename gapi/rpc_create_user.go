@@ -13,7 +13,11 @@ import (
 )
 
 func (server *Server) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb.CreateUserResponse, error) {
-	hashedPassword := util.HashPassword(req.GetPassword())
+	hashedPassword, err := util.HashPasswordBcrypt(req.GetPassword())
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "Failed to hash password")
+	}
+
 	createUserArgs := db.CreateUserParams{
 		Username:       req.GetUsername(),
 		Fullname:       req.GetFullname(),

@@ -50,5 +50,5 @@ func RandomFullname() string {
 }
 
 func RandomPassword() string {
-	return HashPassword(RandomString(5))
+	return HashPasswordBlake(RandomString(5))
 }
