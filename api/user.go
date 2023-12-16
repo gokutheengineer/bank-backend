@@ -1,8 +1,8 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	db "github.com/gokutheengineer/bank-backend/db/sqlc"
@@ -12,13 +12,6 @@ type createUserRequest struct {
 	Username string `json:"username" binding:"required,alphanum"`
 	Fullname string `json:"fullname" binding:"required"`
 	Password string `json:"password" binding:"required"`
-}
-
-type userResponse struct {
-	Username          string    `json:"Username" binding:"required,alphanum"`
-	Password          string    `json:"password" binding:"required"`
-	CreatedAt         time.Time `json:"created_at"`
-	PasswordChangedAt time.Time `json:"password_changed_at"`
 }
 
 func (server *Server) handleCreateUser(ctx *gin.Context) {
@@ -44,4 +37,28 @@ func (server *Server) handleCreateUser(ctx *gin.Context) {
 
 func (server *Server) handleLoginUser(ctx *gin.Context) {
 
+}
+
+type getUserRequest struct {
+	Username string `json:"username" binding:"required,alphanum"`
+}
+
+func (server *Server) handleGetUser(ctx *gin.Context) {
+	// handlles get user op
+	var req getUserRequest
+
+	fmt.Println("in handleGetUser")
+
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		fmt.Println("in handleGetUser err", err)
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	user, err := server.store.GetUser(ctx, req.Username)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+	}
+
+	ctx.JSON(http.StatusOK, user)
 }

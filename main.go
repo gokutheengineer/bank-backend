@@ -57,7 +57,7 @@ func runGinServer(store db.Store, config util.Config) {
 	server := api.NewServer(store)
 	err := server.Start(config.HttpServerAddress)
 	if err != nil {
-		log.Fatal("can't start the server")
+		log.Fatal("can't start http server")
 	}
 	fmt.Printf("http server started at: %s", config.HttpServerAddress)
 }
