@@ -16,7 +16,7 @@ type createUserRequest struct {
 	Password string `json:"password" binding:"required,min=6"`
 }
 
-type CreateUserResponse struct {
+type createUserResponse struct {
 	Username          string    `json:"username"`
 	Fullname          string    `json:"fullname"`
 	CreatedAt         time.Time `json:"created_at"`
@@ -54,7 +54,7 @@ func (server *Server) handleCreateUser(ctx *gin.Context) {
 		return
 	}
 
-	rsp := &CreateUserResponse{
+	rsp := &createUserResponse{
 		Username:          user.Username,
 		Fullname:          user.Fullname,
 		CreatedAt:         user.CreatedAt,
