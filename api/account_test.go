@@ -63,7 +63,7 @@ func TestGetAccountAPI(t *testing.T) {
 			testStore := mockdb.NewMockStore(ctrl)
 			testCase.buildStubs(testStore)
 
-			server := NewServer(testStore)
+			server := newTestServer(t, testStore)
 			// to record response of the API request without running a server we use httptes package's recorder
 			recorder := httptest.NewRecorder()
 

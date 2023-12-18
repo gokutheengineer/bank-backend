@@ -1,14 +1,13 @@
 package api
 
 import (
-	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	db "github.com/gokutheengineer/bank-backend/db/sqlc"
 	"github.com/gokutheengineer/bank-backend/util"
-	"github.com/lib/pq"
 )
 
 type createUserRequest struct {
@@ -46,14 +45,10 @@ func (server *Server) handleCreateUser(ctx *gin.Context) {
 
 	user, err := server.store.CreateUser(ctx, createUserArgs)
 	if err != nil {
-		if pqErr, ok := err.(*pq.Error); ok {
-			switch pqErr.Code {
-			case "unique_violation":
-				{
-					ctx.JSON(http.StatusForbidden, errorResponse(err))
-					return
-				}
-			}
+		// TODO: check why the returned error can't be casted to *pq.Error
+		if strings.Contains(err.Error(), "SQLSTATE 23505") {
+			ctx.JSON(http.StatusForbidden, errorResponse(err))
+			return
 		}
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
@@ -81,10 +76,7 @@ func (server *Server) handleGetUser(ctx *gin.Context) {
 	// handlles get user op
 	var req getUserRequest
 
-	fmt.Println("in handleGetUser")
-
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		fmt.Println("in handleGetUser err", err)
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
