@@ -1,6 +1,8 @@
 package api
 
 import (
+	"go/token"
+
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/validator/v10"
@@ -9,8 +11,9 @@ import (
 
 // Server servers HTTP reqs
 type Server struct {
-	store  db.Store
-	router *gin.Engine
+	store      db.Store
+	tokenMaker token.Maker
+	router     *gin.Engine
 }
 
 // NewServer creates a new htpp server
