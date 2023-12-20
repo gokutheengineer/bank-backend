@@ -54,8 +54,11 @@ func runGrpcServer(store db.Store, config util.Config) {
 }
 
 func runGinServer(store db.Store, config util.Config) {
-	server := api.NewServer(store)
-	err := server.Start(config.HttpServerAddress)
+	server, err := api.NewServer(store, config)
+	if err != nil {
+		log.Fatal("can't create server: ", err)
+	}
+	err = server.Start(config.HttpServerAddress)
 	if err != nil {
 		log.Fatal("can't start http server")
 	}

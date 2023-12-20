@@ -11,8 +11,6 @@ func TestHashPasswordBlake(t *testing.T) {
 	password := RandomString(6)
 	hashedPassword := HashPasswordBlake(password)
 
-	fmt.Println("Blake password", password, "hashedPassword", hashedPassword)
-
 	require.NotEmpty(t, hashedPassword)
 	require.NotEqual(t, password, hashedPassword)
 
@@ -33,9 +31,9 @@ func TestHashPasswordBcrypt(t *testing.T) {
 	require.NotEmpty(t, hashedPassword)
 	require.NotEqual(t, password, hashedPassword)
 
-	isValid := VerifyPasswordBcrypt(password, hashedPassword)
-	require.True(t, isValid)
+	err = VerifyPasswordBcrypt(password, hashedPassword)
+	require.NoError(t, err)
 
-	isValid = VerifyPasswordBcrypt(RandomString(6), hashedPassword)
-	require.False(t, isValid)
+	err = VerifyPasswordBcrypt(RandomString(6), hashedPassword)
+	require.NoError(t, err)
 }

@@ -30,8 +30,7 @@ func VerifyPasswordBlake(password string, hashedpassword string) bool {
 	return hex.EncodeToString(hash[:]) == hashedpassword
 }
 
-// VerifyPasswordBcrypt verifies a password using bcrypt. Returns true if the password matches the hash
-func VerifyPasswordBcrypt(password string, hashedpassword string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(hashedpassword), []byte(password))
-	return err == nil
+// VerifyPasswordBcrypt verifies a password using bcrypt.
+func VerifyPasswordBcrypt(password string, hashedpassword string) error {
+	return bcrypt.CompareHashAndPassword([]byte(hashedpassword), []byte(password))
 }

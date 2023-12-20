@@ -31,7 +31,7 @@ func (e eqUserMatcher) Matches(x interface{}) bool {
 	}
 
 	// Check password
-	if !util.VerifyPasswordBcrypt(e.password, e.arg.PasswordHashed) {
+	if err := util.VerifyPasswordBcrypt(e.password, e.arg.PasswordHashed); err != nil {
 		return false
 	}
 
