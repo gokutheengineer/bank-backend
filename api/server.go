@@ -52,12 +52,14 @@ func (server *Server) setupRouter() {
 	router := gin.Default()
 	router.POST("/users", server.handleCreateUser)
 	router.POST("/users/login", server.handleLoginUser)
-	router.GET("/users/get", server.handleGetUser)
 
-	router.POST("/accounts", server.handleCreateAccount)
-	router.GET("/accounts/:id", server.handleGetAccount)
-	router.GET("/accounts", server.handleListAccounts)
-	router.POST("/transfer", server.handleCreateTransfer)
+	authRoutes := router.Group("/").Use(authMiddleware(server.tokenMaker))
+
+	authRoutes.GET("/users/get", server.handleGetUser)
+	authRoutes.POST("/accounts", server.handleCreateAccount)
+	authRoutes.GET("/accounts/:id", server.handleGetAccount)
+	authRoutes.GET("/accounts", server.handleListAccounts)
+	authRoutes.POST("/transfer", server.handleCreateTransfer)
 
 	server.router = router
 }

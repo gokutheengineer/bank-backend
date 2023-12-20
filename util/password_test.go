@@ -1,7 +1,6 @@
 package util
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -24,8 +23,6 @@ func TestHashPasswordBlake(t *testing.T) {
 func TestHashPasswordBcrypt(t *testing.T) {
 	password := RandomString(6)
 	hashedPassword, err := HashPasswordBcrypt(password)
-
-	fmt.Println("Bcrypt password", password, "hashedPassword", hashedPassword)
 
 	require.NoError(t, err)
 	require.NotEmpty(t, hashedPassword)
