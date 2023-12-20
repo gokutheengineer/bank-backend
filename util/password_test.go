@@ -35,5 +35,5 @@ func TestHashPasswordBcrypt(t *testing.T) {
 	require.NoError(t, err)
 
 	err = VerifyPasswordBcrypt(RandomString(6), hashedPassword)
-	require.NoError(t, err)
+	require.Error(t, err)
 }
