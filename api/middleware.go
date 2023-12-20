@@ -8,9 +8,15 @@ import (
 	"github.com/gokutheengineer/bank-backend/token"
 )
 
+const (
+	authorizationHeaderKey  = "authorization"
+	authorizationTypeBearer = "bearer"
+	authorizationPayloadKey = "authorization_payload"
+)
+
 func authMiddleware(tokenMaker token.Maker) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		authorizationHeader := ctx.GetHeader("Authorization")
+		authorizationHeader := ctx.GetHeader(authorizationHeaderKey)
 		if len(authorizationHeader) == 0 {
 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "authorization header is not provided"})
 			return
@@ -23,7 +29,7 @@ func authMiddleware(tokenMaker token.Maker) gin.HandlerFunc {
 		}
 
 		authorizationType := strings.ToLower(fields[0])
-		if authorizationType != "bearer" {
+		if authorizationType != authorizationTypeBearer {
 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid authorization type"})
 			return
 		}
@@ -35,7 +41,7 @@ func authMiddleware(tokenMaker token.Maker) gin.HandlerFunc {
 			return
 		}
 
-		ctx.Set("authorization_payload", payload)
+		ctx.Set(authorizationPayloadKey, payload)
 		ctx.Next()
 	}
 }
