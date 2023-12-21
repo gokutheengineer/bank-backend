@@ -84,6 +84,7 @@ type listAccountsReqs struct {
 	PageSize int32 `form:"page_size" binding:"required,min=5,max=20"`
 }
 
+// TODO: add auth middleware
 func (server *Server) handleListAccounts(ctx *gin.Context) {
 	var req listAccountsReqs
 
